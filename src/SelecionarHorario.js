@@ -1,31 +1,54 @@
 import styled from "styled-components"
-
+import { useParams } from "react-router-dom";
+import axios from "axios";
+import React, { useEffect } from "react";
 
 export default function SelecionarHorario() {
+
+    const { idFilme } = useParams()
+    const [obgFilme, setObjFilme] = React.useState(0)
+    const [diasDispo, setDiasDispo] = React.useState([])
+
+    useEffect((
+        () => {
+            const URL = `https://mock-api.driven.com.br/api/v5/cineflex/movies/${idFilme}/showtimes`
+            const promise = axios.get(URL)
+            promise.then((res) => {
+                setObjFilme(res.data)
+                setDiasDispo(res.data.days)
+                console.log(res.data)
+                console.log(res.data.days)
+            })
+            promise.catch((err) => console.log(err.response.data))
+        }), [])
+
+
     return (
         <>
             <Selecione>
                 <p>Seleciono o horário</p>
                 <SecoesDisponiveis>
-                    <Secao>
-                        <p>Quinta-feira - 24/06/2021</p>
-                        <HorariosDisponiveis>
-                            <span>15:30</span>
-                            <span>14:30</span>
-                        </HorariosDisponiveis>
-                    </Secao>
-                    <Secao>
-                        <p>Data</p>
-                        <HorariosDisponiveis>
-                            <span>15:30</span>
-                            <span>14:30</span>
-                        </HorariosDisponiveis>
-                    </Secao>
+
+                    {diasDispo.map((obj) => {
+                        return (
+                            <Secao key={obj.id}>
+                                <p>{obj.weekday} - {obj.date}</p>
+                                <HorariosDisponiveis>
+                                    {obj.showtimes.map((i)=>{
+                                        return(
+                                            <span>{i.name}</span>
+                                        )
+                                    })}
+                                </HorariosDisponiveis>
+                            </Secao>
+                        )
+                    })}
+
                 </SecoesDisponiveis>
             </Selecione>
             <FooterFilmes>
-                <Filme><img src="https://upload.wikimedia.org/wikipedia/pt/e/e6/Enola_Holmes_poster.jpeg" alt='' /></Filme>
-                <span>NOME DO FILME</span>
+                <Filme><img src={obgFilme.posterURL} alt='' /></Filme>
+                <span>{obgFilme.title}</span>
             </FooterFilmes>
         </>
     )
@@ -44,7 +67,6 @@ const Selecione = styled.div`
     }
     font-family:'Roboto', sans-serif;
 `;
-
 
 const SecoesDisponiveis = styled.div`
     width:500px;
@@ -83,7 +105,7 @@ const FooterFilmes = styled.div`
     display:flex;
     align-items:center;
     justify-content:center;
-    position:absolute;
+    position:fixed;
     bottom:0;
     z-index:1;
     border:1px solid #9EADBA;
