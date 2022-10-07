@@ -5,24 +5,20 @@ import reset from './reset.css'
 import SelecionarAssento from "./SelecionarAssento";
 import SelecionarHorario from "./SelecionarHorario";
 import SucessoPage from "./SucessoPage";
-
-const r = reset;
-function Tralala(){
-    return r
-}
-Tralala()
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 
 export default function App() {
     return (
-        <>
+        <BrowserRouter>
             <Logo>CINEFLEX</Logo>
-            {/* <SelecionarFilmes/> */}
-            {/* <SelecionarHorario/> */}
-            {/* <SelecionarAssento/> */}
-            <SucessoPage/>
-
-        </>
+            <Routes>
+                <Route path="/" element={<SelecionarFilmes/>} />
+                <Route path="/horario" element={<SelecionarHorario/>} />
+                <Route path="/" element={<SelecionarAssento/>} />
+                <Route path="/" element={<SucessoPage/> } />
+            </Routes>
+        </BrowserRouter>
     )
 }
 

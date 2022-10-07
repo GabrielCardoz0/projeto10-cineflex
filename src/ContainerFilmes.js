@@ -1,30 +1,56 @@
 import styled from "styled-components";
+import { useEffect } from "react";
+import axios from "axios";
+import react from "react";
 
 export default function SelecionarFilmes() {
+
+    const [filmesLista, setFilmesLista] = react.useState([])
+
+
+    useEffect(
+        () => {
+            const URL = 'https://mock-api.driven.com.br/api/v5/cineflex/movies'
+
+            const promise = axios.get(URL)
+
+            promise.then(
+                (res) => {
+                    console.log(res.data)
+                    setFilmesLista(res.data)
+                })
+
+                promise.catch((err) => console.log(err.response.data))
+        }
+        , [])
+
+
+
+
     return (
         <ContainerFilmes>
             <SelecioneFilme>
                 <p>Selecione o filme</p>
+
                 <ListaFilmes>
-
-                    <Filme>
-                        <img src="https://upload.wikimedia.org/wikipedia/pt/e/e6/Enola_Holmes_poster.jpeg" alt='' />
-                    </Filme>
-
-                    <Filme>
-                        <img src="https://upload.wikimedia.org/wikipedia/pt/e/e6/Enola_Holmes_poster.jpeg" alt='' />
-                    </Filme>
-
-                    <Filme>
-                        <img src="https://upload.wikimedia.org/wikipedia/pt/e/e6/Enola_Holmes_poster.jpeg" alt='' />
-                    </Filme>
-
-
+                    {filmesLista.map((o) => {
+                        return (
+                            <Filme key={o.id}>
+                                <img src={o.posterURL} alt='' />
+                            </Filme>
+                        )
+                    })}
                 </ListaFilmes>
+
             </SelecioneFilme>
         </ContainerFilmes>
     )
 };
+
+
+
+
+
 
 const ContainerFilmes = styled.div`
     display:flex;
@@ -51,7 +77,7 @@ const SelecioneFilme = styled.div`
 const ListaFilmes = styled.div`
     display:flex;
     flex-wrap:wrap;
-    `;
+`;
 
 const Filme = styled.div`
     width:145px;
