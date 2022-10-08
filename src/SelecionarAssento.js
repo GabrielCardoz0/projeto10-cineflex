@@ -1,61 +1,55 @@
+import axios from "axios";
+import React, { useEffect } from "react";
+import { useParams } from "react-router-dom";
 import styled from "styled-components"
 
 export default function SelecionarAssento() {
+
+    const { idSessao } = useParams()
+
+    const [secaoEscohida, setSecaoEscolhida] = React.useState({})
+
+    const [listaAssentos, setListaAssentos] = React.useState([])
+
+    const [filmeEscolhido, setFilmeEscolhido] = React.useState({})
+
+    const [diaEscolhido, setDiaEscolhido] = React.useState({})
+
+    const [assentosEscolhidos, setAssentosEscolhidos] = React.useState([])
+
+    function selecionarAssento(i, id){
+        const listaCopiada = [...listaAssentos]
+        listaCopiada[i].name = 'selecionado'
+        setListaAssentos(listaCopiada)
+        setAssentosEscolhidos([...assentosEscolhidos, id])
+    }
+
+    useEffect((() => {
+        const URL = `https://mock-api.driven.com.br/api/v5/cineflex/showtimes/${idSessao}/seats`
+        const promise = axios.get(URL)
+        promise.then((res) => {
+            console.log(res.data)
+            setSecaoEscolhida(res.data)
+            setListaAssentos(res.data.seats)
+            setFilmeEscolhido(res.data.movie)
+            setDiaEscolhido(res.data.day)
+        })
+    }), [])
+
     return (
         <>
             <ListaAssentos>
                 <span>Selecione o(s) assento(s)</span>
                 <AssentosDisponiveis>
-                    <AssentoDisponivel>01</AssentoDisponivel>
-                    <AssentoDisponivel>01</AssentoDisponivel>
-                    <AssentoDisponivel>10</AssentoDisponivel>
-                    <AssentoDisponivel>01</AssentoDisponivel>
-                    <AssentoDisponivel>01</AssentoDisponivel>
-                    <AssentoDisponivel>01</AssentoDisponivel>
-                    <AssentoDisponivel>01</AssentoDisponivel>
-                    <AssentoDisponivel>10</AssentoDisponivel>
-                    <AssentoDisponivel>01</AssentoDisponivel>
-                    <AssentoDisponivel>01</AssentoDisponivel>
-                    <AssentoDisponivel>01</AssentoDisponivel>
-                    <AssentoDisponivel>01</AssentoDisponivel>
-                    <AssentoDisponivel>10</AssentoDisponivel>
-                    <AssentoDisponivel>01</AssentoDisponivel>
-                    <AssentoDisponivel>01</AssentoDisponivel>
-                    <AssentoDisponivel>01</AssentoDisponivel>
-                    <AssentoDisponivel>01</AssentoDisponivel>
-                    <AssentoDisponivel>10</AssentoDisponivel>
-                    <AssentoDisponivel>01</AssentoDisponivel>
-                    <AssentoDisponivel>01</AssentoDisponivel>
-                    <AssentoDisponivel>01</AssentoDisponivel>
-                    <AssentoDisponivel>01</AssentoDisponivel>
-                    <AssentoDisponivel>10</AssentoDisponivel>
-                    <AssentoDisponivel>01</AssentoDisponivel>
-                    <AssentoDisponivel>01</AssentoDisponivel>
-                    <AssentoDisponivel>01</AssentoDisponivel>
-                    <AssentoDisponivel>01</AssentoDisponivel>
-                    <AssentoDisponivel>10</AssentoDisponivel>
-                    <AssentoDisponivel>01</AssentoDisponivel>
-                    <AssentoDisponivel>01</AssentoDisponivel>
-                    <AssentoDisponivel>01</AssentoDisponivel>
-                    <AssentoDisponivel>01</AssentoDisponivel>
-                    <AssentoDisponivel>10</AssentoDisponivel>
-                    <AssentoDisponivel>01</AssentoDisponivel>
-                    <AssentoDisponivel>01</AssentoDisponivel>
-                    <AssentoDisponivel>01</AssentoDisponivel>
-                    <AssentoDisponivel>01</AssentoDisponivel>
-                    <AssentoDisponivel>10</AssentoDisponivel>
-                    <AssentoDisponivel>01</AssentoDisponivel>
-                    <AssentoDisponivel>01</AssentoDisponivel>
-                    <AssentoDisponivel>01</AssentoDisponivel>
-                    <AssentoDisponivel>01</AssentoDisponivel>
-                    <AssentoDisponivel>10</AssentoDisponivel>
-                    <AssentoDisponivel>01</AssentoDisponivel>
-                    <AssentoDisponivel>01</AssentoDisponivel>
-                    <AssentoDisponivel>01</AssentoDisponivel>
-                    <AssentoDisponivel>01</AssentoDisponivel>
-                    <AssentoDisponivel>10</AssentoDisponivel>
-                    <AssentoDisponivel>01</AssentoDisponivel>
-                    <AssentoDisponivel>01</AssentoDisponivel>
+                    {listaAssentos.map((o,i) => {
+                        if(o.name === 'selecionado'){
+                            return(<AssentoSelecionado key={o.id}>{i+1}</AssentoSelecionado>)
+                        } else if(o.isAvailable){
+                            return(<AssentoDisponivel key={o.id} onClick={() => selecionarAssento(i, o.id)}>{o.name}</AssentoDisponivel>)
+                        } else {
+                            return(<AssentoIndisponivel key={o.id} onClick={()=> alert('assento indisponível')}>{o.name}</AssentoIndisponivel>)
+                        }
+                    })}
 
                 </AssentosDisponiveis>
                 <DescricaoAssentos>
@@ -75,10 +69,9 @@ export default function SelecionarAssento() {
                 <ReservarAssento>Reservar Assento(s)</ReservarAssento>
             </ListaAssentos>
             <FooterFilmes>
-                <Filme><img src="https://upload.wikimedia.org/wikipedia/pt/e/e6/Enola_Holmes_poster.jpeg" alt='' /></Filme>
+                <Filme><img src={filmeEscolhido.posterURL} alt='' /></Filme>
                 <span>
-                    NOME DO FILME
-                    Quinta-feira - 15:00
+                    {`${filmeEscolhido.title} - ${diaEscolhido.weekday} - ${secaoEscohida.name}`}
                 </span>
             </FooterFilmes>
         </>
@@ -237,3 +230,9 @@ const ReservarAssento = styled.button`
     border-radius:3px;
 
 `;
+
+// if(o.isAvailable){
+//     return(<AssentoDisponivel key={o.id} onClick={() => selecionarAssento(i)}>{o.name}</AssentoDisponivel>)
+// } else {
+//     return(<AssentoIndisponivel key={o.id} onClick={()=> alert('assento indisponível')}>{o.name}</AssentoIndisponivel>)
+// }
